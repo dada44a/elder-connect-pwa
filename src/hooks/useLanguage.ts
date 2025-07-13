@@ -30,7 +30,8 @@ type TranslationKey =
   | 'markedAsTaken' | 'medicineSkipped' | 'reminderSkipped' | 'stayHealthy' 
   | 'addMedicine' | 'addNewMedicine' | 'medicineName' | 'enterMedicineName' 
   | 'dosage' | 'enterDosage' | 'frequency' | 'selectFrequency' | 'onceDaily' 
-  | 'twiceDaily' | 'threeTimes' | 'weekly' | 'time' | 'skip';
+  | 'twiceDaily' | 'threeTimes' | 'weekly' | 'time' | 'skip' | 'viewYourEvents'
+  | 'confirmed' | 'cancelled' | 'viewDetails';
 
 type Translations = {
   [key in Language]: {
@@ -174,6 +175,10 @@ export const useLanguage = () => {
       weekly: "Weekly",
       time: "Time",
       skip: "Skip",
+      viewYourEvents: "View your upcoming and enrolled events",
+      confirmed: "Confirmed",
+      cancelled: "Cancelled",
+      viewDetails: "View Details",
     },
     es: {
       appTitle: "Plataforma de Cuidado para Adultos Mayores",
@@ -307,6 +312,10 @@ export const useLanguage = () => {
       weekly: "Semanal",
       time: "Hora",
       skip: "Omitir",
+      viewYourEvents: "Ver tus eventos próximos e inscritos",
+      confirmed: "Confirmado",
+      cancelled: "Cancelado",
+      viewDetails: "Ver Detalles",
     },
     hi: {
       appTitle: "वरिष्ठ देखभाल मंच",
@@ -440,6 +449,10 @@ export const useLanguage = () => {
       weekly: "साप्ताहिक",
       time: "समय",
       skip: "छोड़ें",
+      viewYourEvents: "अपने आगामी और नामांकित कार्यक्रम देखें",
+      confirmed: "पुष्ट",
+      cancelled: "रद्द",
+      viewDetails: "विवरण देखें",
     },
     ne: {
       appTitle: "वरिष्ठ हेरचाह प्लेटफर्म",
@@ -573,6 +586,10 @@ export const useLanguage = () => {
       weekly: "साप्ताहिक",
       time: "समय",
       skip: "छोड्नुहोस्",
+      viewYourEvents: "आफ्ना आगामी र दर्ता गरिएका कार्यक्रमहरू हेर्नुहोस्",
+      confirmed: "पुष्टि भएको",
+      cancelled: "रद्द गरिएको",
+      viewDetails: "विवरणहरू हेर्नुहोस्",
     }
   };
 
