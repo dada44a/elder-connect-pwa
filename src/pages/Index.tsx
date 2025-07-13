@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Calendar, MapPin, Clock, Users, Settings, Heart, Shield, MessageCircle, User, UserCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -12,6 +11,7 @@ import { UserProfile } from '@/components/UserProfile';
 import { GuardianConnections } from '@/components/GuardianConnections';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import { useLanguage } from '@/hooks/useLanguage';
+import { AdminDashboard } from '@/components/AdminDashboard';
 
 type UserType = 'senior' | 'guardian';
 
@@ -28,6 +28,7 @@ const Index = () => {
     { id: 'profile', label: t('profile'), icon: User },
     { id: 'guardians', label: t('guardians'), icon: UserCheck },
     { id: 'guardian', label: t('guardianPanel'), icon: Shield },
+    { id: 'admin', label: t('adminDashboard'), icon: Settings },
   ];
 
   const handleUserTypeChange = (type: UserType) => {
@@ -75,9 +76,9 @@ const Index = () => {
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex space-x-1 min-w-max">
             {tabs.map((tab) => {
-              // Hide guardian panel for senior mode, hide other tabs for guardian mode
+              // Hide guardian panel for senior mode, hide other tabs for guardian mode, show admin for both
               if (userType === 'senior' && tab.id === 'guardian') return null;
-              if (userType === 'guardian' && tab.id !== 'guardian') return null;
+              if (userType === 'guardian' && tab.id !== 'guardian' && tab.id !== 'admin') return null;
               
               const Icon = tab.icon;
               return (
@@ -108,6 +109,7 @@ const Index = () => {
         {activeTab === 'profile' && <UserProfile />}
         {activeTab === 'guardians' && <GuardianConnections />}
         {activeTab === 'guardian' && <GuardianPanel />}
+        {activeTab === 'admin' && <AdminDashboard />}
       </main>
 
       {/* Quick Stats Footer - only show in senior mode */}
