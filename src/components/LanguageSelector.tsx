@@ -1,12 +1,13 @@
 
 import React from 'react';
 import { Globe } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useLanguage } from '@/hooks/useLanguage';
+import { useRouter } from 'next/router';
 
 export const LanguageSelector = () => {
-  const { language, setLanguage } = useLanguage();
+  const { language } = useLanguage();
+  const router = useRouter();
 
   const languages = [
     { code: 'en', name: 'English', flag: '🇺🇸' },
@@ -15,7 +16,7 @@ export const LanguageSelector = () => {
   ];
 
   const handleLanguageChange = (value: string) => {
-    setLanguage(value as 'en' | 'hi' | 'ne');
+    router.push(router.pathname, router.asPath, { locale: value });
   };
 
   return (
