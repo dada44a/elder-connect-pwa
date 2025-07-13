@@ -1,6 +1,4 @@
-
-import { useRouter } from 'next/router';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 type TranslationKey =
   | 'appTitle'
@@ -99,7 +97,19 @@ type TranslationKey =
   | 'viewYourEvents'
   | 'confirmed'
   | 'cancelled'
-  | 'viewDetails';
+  | 'viewDetails'
+  | 'selectGuardian'
+  | 'allGuardians'
+  | 'userProfile'
+  | 'manageYourInfo'
+  | 'editProfile'
+  | 'save'
+  | 'yearsOld'
+  | 'age'
+  | 'address'
+  | 'emergencyContact'
+  | 'medicalConditions'
+  | 'guardians';
 
 interface Translations {
   [key: string]: {
@@ -206,6 +216,18 @@ const translations: Translations = {
     confirmed: 'Confirmed',
     cancelled: 'Cancelled',
     viewDetails: 'View Details',
+    selectGuardian: 'Select Guardian',
+    allGuardians: 'All Guardians',
+    userProfile: 'User Profile',
+    manageYourInfo: 'Manage your personal information',
+    editProfile: 'Edit Profile',
+    save: 'Save',
+    yearsOld: 'years old',
+    age: 'Age',
+    address: 'Address',
+    emergencyContact: 'Emergency Contact',
+    medicalConditions: 'Medical Conditions',
+    guardians: 'Guardians',
   },
   hi: {
     appTitle: 'केयरकनेक्ट',
@@ -280,7 +302,7 @@ const translations: Translations = {
     socialGatheringDesc: 'साथी समुदाय के सदस्यों से मिलें और जुड़ें। जलपान, खेल और सार्थक बातचीत का आनंद लें।',
     enrollmentSuccess: 'नामांकन सफल',
     enrolledIn: 'सफलतापूर्वक नामांकित',
-    filterEvents: 'घटनाएँ फ़िल्टर करें',
+    filterEvents: 'घटनाएँ फिल्टर करें',
     healthWellness: 'स्वास्थ्य और कल्याण',
     healthcare: 'स्वास्थ्य सेवा',
     social: 'सामाजिक',
@@ -297,7 +319,7 @@ const translations: Translations = {
     enrolledOn: 'नामांकित',
     upcoming: 'आगामी',
     medicineAlerts: 'दवाई अलर्ट',
-    scheduledFor: 'के लिए निर्धारित',
+    scheduledFor: 'को लागि तालिकाबद्ध',
     quickActions: 'त्वरित क्रियाएं',
     viewAllActivities: 'सभी गतिविधियां देखें',
     setCustomAlerts: 'कस्टम अलर्ट सेट करें',
@@ -305,6 +327,18 @@ const translations: Translations = {
     confirmed: 'पुष्ट',
     cancelled: 'रद्द',
     viewDetails: 'विवरण देखें',
+    selectGuardian: 'अभिभावक चुनें',
+    allGuardians: 'सभी अभिभावक',
+    userProfile: 'उपयोगकर्ता प्रोफ़ाइल',
+    manageYourInfo: 'अपनी व्यक्तिगत जानकारी प्रबंधित करें',
+    editProfile: 'प्रोफ़ाइल संपादित करें',
+    save: 'सहेजें',
+    yearsOld: 'वर्ष का',
+    age: 'आयु',
+    address: 'पता',
+    emergencyContact: 'आपातकालीन संपर्क',
+    medicalConditions: 'चिकित्सा स्थितियां',
+    guardians: 'अभिभावक',
   },
   ne: {
     appTitle: 'केयरकनेक्ट',
@@ -336,7 +370,7 @@ const translations: Translations = {
     addGuardian: 'अभिभावक थप्नुहोस्',
     addNewGuardian: 'नयाँ अभिभावक थप्नुहोस्',
     guardianAdded: 'अभिभावक थपियो',
-    invitationSent: 'निमन्त्रणा पठाइयो',
+    invitationSent: 'निमंत्रणा पठाइयो',
     guardianRemoved: 'अभिभावक हटाइयो',
     connectionRemoved: 'जडान हटाइयो',
     active: 'सक्रिय',
@@ -404,20 +438,31 @@ const translations: Translations = {
     confirmed: 'पुष्टि भयो',
     cancelled: 'रद्द गरियो',
     viewDetails: 'विवरणहरू हेर्नुहोस्',
+    selectGuardian: 'अभिभावक छान्नुहोस्',
+    allGuardians: 'सबै अभिभावकहरू',
+    userProfile: 'उपयोगकर्ता प्रोफाइल',
+    manageYourInfo: 'आफ्नो व्यक्तिगत जानकारी व्यवस्थापन गर्नुहोस्',
+    editProfile: 'प्रोफाइल सम्पादन गर्नुहोस्',
+    save: 'सुरक्षित गर्नुहोस्',
+    yearsOld: 'वर्षको',
+    age: 'उमेर',
+    address: 'ठेगाना',
+    emergencyContact: 'आपतकालीन संपर्क',
+    medicalConditions: 'चिकित्सा अवस्थाहरू',
+    guardians: 'अभिभावकहरू',
   },
 };
 
 export const useLanguage = () => {
-  const router = useRouter();
-  const { locale } = router;
+  const [language, setLanguage] = useState('en');
 
   const t = useMemo(
     () => (key: TranslationKey) => {
-      const translatedText = translations[locale as string]?.[key] || translations['en'][key] || key;
+      const translatedText = translations[language]?.[key] || translations['en'][key] || key;
       return translatedText;
     },
-    [locale]
+    [language]
   );
 
-  return { t, language: locale };
+  return { t, language, setLanguage };
 };

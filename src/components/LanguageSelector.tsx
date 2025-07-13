@@ -3,11 +3,9 @@ import React from 'react';
 import { Globe } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useLanguage } from '@/hooks/useLanguage';
-import { useRouter } from 'next/router';
 
 export const LanguageSelector = () => {
-  const { language } = useLanguage();
-  const router = useRouter();
+  const { language, setLanguage } = useLanguage();
 
   const languages = [
     { code: 'en', name: 'English', flag: '🇺🇸' },
@@ -16,7 +14,7 @@ export const LanguageSelector = () => {
   ];
 
   const handleLanguageChange = (value: string) => {
-    router.push(router.pathname, router.asPath, { locale: value });
+    setLanguage(value);
   };
 
   return (
