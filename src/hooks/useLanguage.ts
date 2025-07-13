@@ -1,299 +1,325 @@
 
-import { useState, createContext, useContext } from 'react';
+import { useState } from 'react';
 
-type Language = 'en' | 'hi' | 'ne';
-
-interface LanguageContextType {
-  language: Language;
-  setLanguage: (lang: Language) => void;
-  t: (key: string) => string;
-}
+export type Language = 'en' | 'hi' | 'ne';
 
 const translations = {
   en: {
-    // App
     appTitle: 'Senior Care Hub',
-    appSubtitle: 'Your health and community companion',
-    seniorMode: 'Senior',
-    guardianMode: 'Guardian',
-    
-    // Navigation
+    appSubtitle: 'Your wellness companion',
+    seniorMode: 'Senior Mode',
+    guardianMode: 'Guardian Mode',
     nearbyEvents: 'Nearby Events',
     medicineReminders: 'Medicine Reminders',
     guardianPanel: 'Guardian Panel',
-    
-    // Events
+    myEnrollments: 'My Enrollments',
+    chatWithGuardian: 'Chat with Guardian',
+    profile: 'Profile',
+    guardians: 'Guardians',
+    // Event-related
     morningYoga: 'Morning Yoga Session',
-    morningYogaDesc: 'Gentle yoga exercises perfect for seniors. Improve flexibility and balance in a friendly group setting.',
-    healthCheckup: 'Free Health Checkup',
-    healthCheckupDesc: 'Comprehensive health screening including blood pressure, diabetes, and general wellness check.',
-    socialGathering: 'Community Social Hour',
-    socialGatheringDesc: 'Meet neighbors, enjoy tea and snacks, and participate in fun group activities.',
-    
-    // Actions
+    morningYogaDesc: 'Start your day with gentle yoga exercises designed for seniors.',
+    healthCheckup: 'Health Checkup Camp',
+    healthCheckupDesc: 'Free health screening and consultation with qualified doctors.',
+    socialGathering: 'Social Gathering',
+    socialGatheringDesc: 'Meet fellow community members and enjoy cultural activities.',
     enrollNow: 'Enroll Now',
     enrolled: 'Enrolled',
-    enrollmentSuccess: 'Successfully Enrolled!',
-    enrolledIn: 'You are now enrolled in',
+    enrollmentSuccess: 'Enrollment Successful!',
+    enrolledIn: 'Successfully enrolled in',
     filterEvents: 'Filter Events',
-    away: 'away',
-    
-    // Categories
     healthWellness: 'Health & Wellness',
     healthcare: 'Healthcare',
     social: 'Social',
-    
+    away: 'away',
+    // My Enrollments
+    viewYourEvents: 'View and manage your enrolled events',
+    confirmed: 'Confirmed',
+    pending: 'Pending',
+    cancelled: 'Cancelled',
+    viewDetails: 'View Details',
     // Medicine
     addMedicine: 'Add Medicine',
-    addNewMedicine: 'Add New Medicine',
     medicineName: 'Medicine Name',
     dosage: 'Dosage',
     frequency: 'Frequency',
-    time: 'Time',
+    startDate: 'Start Date',
+    notes: 'Notes',
+    saveMedicine: 'Save Medicine',
+    markAsTaken: 'Mark as Taken',
     taken: 'Taken',
-    skip: 'Skip',
+    scheduled: 'Scheduled',
+    overdue: 'Overdue',
+    // Chat
+    stayConnected: 'Stay connected with your family',
+    messages: 'Messages',
+    typeYourMessage: 'Type your message...',
+    refresh: 'Refresh',
+    // Profile
+    userProfile: 'User Profile',
+    manageYourInfo: 'Manage your personal information',
+    editProfile: 'Edit Profile',
+    save: 'Save',
     cancel: 'Cancel',
-    
-    // Guardian
+    fullName: 'Full Name',
+    age: 'Age',
+    phoneNumber: 'Phone Number',
+    address: 'Address',
+    emergencyContact: 'Emergency Contact',
+    medicalConditions: 'Medical Conditions',
+    yearsOld: 'years old',
+    // Guardian Connections
+    guardianConnections: 'Guardian Connections',
+    manageGuardians: 'Manage your guardian connections',
+    addGuardian: 'Add Guardian',
+    addNewGuardian: 'Add New Guardian',
+    enterName: 'Enter full name',
+    relation: 'Relation',
+    enterRelation: 'e.g., Son, Daughter, Caregiver',
+    enterPhone: 'Enter phone number',
+    email: 'Email',
+    optional: 'Optional',
+    enterEmail: 'Enter email address',
+    sendInvitation: 'Send Invitation',
+    guardianAdded: 'Guardian Added',
+    invitationSent: 'Invitation sent successfully',
+    guardianRemoved: 'Guardian Removed',
+    connectionRemoved: 'Connection removed successfully',
+    active: 'Active',
+    inactive: 'Inactive',
+    // Guardian Panel
     guardianDashboard: 'Guardian Dashboard',
-    monitorLovedOnes: 'Monitor and care for your loved ones',
+    monitorLovedOnes: 'Monitor and support your loved ones',
+    notificationsOn: 'Notifications On',
+    notificationsOff: 'Notifications Off',
     connectedSeniors: 'Connected Seniors',
+    lastSeen: 'Last seen',
     recentEnrollments: 'Recent Event Enrollments',
+    enrolledOn: 'Enrolled on',
+    upcoming: 'Upcoming',
     medicineAlerts: 'Medicine Alerts',
+    scheduledFor: 'Scheduled for',
     quickActions: 'Quick Actions',
-    
-    // Stats
+    viewAllActivities: 'View All Activities',
+    setCustomAlerts: 'Set Custom Alerts',
+    // Footer stats
     upcomingEvents: 'Upcoming Events',
     medicinesScheduled: 'Medicines Scheduled',
     connectedGuardians: 'Connected Guardians',
-    
-    // Common
-    error: 'Error',
-    success: 'Success',
-    loading: 'Loading...',
-    active: 'Active',
-    pending: 'Pending',
-    lastSeen: 'Last seen',
-    scheduledFor: 'Scheduled for',
-    enrolledOn: 'Enrolled on',
-    upcoming: 'Upcoming',
-    
-    // Frequencies
-    onceDaily: 'Once Daily',
-    twiceDaily: 'Twice Daily',
-    threeTimes: 'Three Times Daily',
-    weekly: 'Weekly',
-    
-    // Messages
-    fillAllFields: 'Please fill all fields',
-    medicineAdded: 'Medicine Added',
-    addedSuccessfully: 'added successfully',
-    medicineTaken: 'Medicine Taken',
-    markedAsTaken: 'Medicine marked as taken',
-    medicineSkipped: 'Medicine Skipped',
-    reminderSkipped: 'Reminder has been skipped',
-    stayHealthy: 'Stay healthy with timely reminders',
-    enterMedicineName: 'Enter medicine name',
-    enterDosage: 'Enter dosage (e.g., 500mg)',
-    selectFrequency: 'Select frequency',
-    notificationsOn: 'Notifications On',
-    notificationsOff: 'Notifications Off',
-    viewAllActivities: 'View All Activities',
-    setCustomAlerts: 'Set Custom Alerts',
   },
-  
   hi: {
-    // App
-    appTitle: 'वरिष्ठ देखभाल केंद्र',
-    appSubtitle: 'आपका स्वास्थ्य और समुदाय साथी',
-    seniorMode: 'वरिष्ठ',
-    guardianMode: 'संरक्षक',
-    
-    // Navigation
-    nearbyEvents: 'पास की गतिविधियाँ',
-    medicineReminders: 'दवा अनुस्मारक',
-    guardianPanel: 'संरक्षक पैनल',
-    
-    // Events
-    morningYoga: 'सुबह का योग सत्र',
-    morningYogaDesc: 'वरिष्ठ नागरिकों के लिए आदर्श कोमल योग अभ्यास। मित्रवत समूह सेटिंग में लचीलेपन और संतुलन में सुधार करें।',
-    healthCheckup: 'निःशुल्क स्वास्थ्य जाँच',
-    healthCheckupDesc: 'रक्तचाप, मधुमेह, और सामान्य कल्याण जाँच सहित व्यापक स्वास्थ्य जाँच।',
-    socialGathering: 'सामुदायिक मिलन समय',
-    socialGatheringDesc: 'पड़ोसियों से मिलें, चाय और नाश्ता का आनंद लें, और मजेदार समूहिक गतिविधियों में भाग लें।',
-    
-    // Actions
-    enrollNow: 'अभी दाखिला लें',
-    enrolled: 'दाखिला हो गया',
-    enrollmentSuccess: 'सफलतापूर्वक दाखिला हो गया!',
-    enrolledIn: 'आपका दाखिला हो गया है',
-    filterEvents: 'गतिविधियाँ फ़िल्टर करें',
-    away: 'दूर',
-    
-    // Categories
-    healthWellness: 'स्वास्थ्य एवं कल्याण',
+    appTitle: 'सीनियर केयर हब',
+    appSubtitle: 'आपका स्वास्थ्य साथी',
+    seniorMode: 'सीनियर मोड',
+    guardianMode: 'गार्डियन मोड',
+    nearbyEvents: 'नजदीकी कार्यक्रम',
+    medicineReminders: 'दवा रिमाइंडर',
+    guardianPanel: 'गार्डियन पैनल',
+    myEnrollments: 'मेरे नामांकन',
+    chatWithGuardian: 'गार्डियन से चैट',
+    profile: 'प्रोफाइल',
+    guardians: 'गार्डियन',
+    // Event-related
+    morningYoga: 'सुबह योग सत्र',
+    morningYogaDesc: 'वरिष्ठ नागरिकों के लिए डिज़ाइन किए गए सौम्य योग अभ्यास के साथ अपना दिन शुरू करें।',
+    healthCheckup: 'स्वास्थ्य जांच शिविर',
+    healthCheckupDesc: 'योग्य डॉक्टरों के साथ मुफ्त स्वास्थ्य जांच और परामर्श।',
+    socialGathering: 'सामाजिक मेल-जोल',
+    socialGatheringDesc: 'समुदायिक सदस्यों से मिलें और सांस्कृतिक गतिविधियों का आनंद लें।',
+    enrollNow: 'अभी नामांकन करें',
+    enrolled: 'नामांकित',
+    enrollmentSuccess: 'नामांकन सफल!',
+    enrolledIn: 'सफलतापूर्वक नामांकित',
+    filterEvents: 'कार्यक्रम फिल्टर करें',
+    healthWellness: 'स्वास्थ्य और कल्याण',
     healthcare: 'स्वास्थ्य सेवा',
     social: 'सामाजिक',
-    
+    away: 'दूर',
+    // My Enrollments
+    viewYourEvents: 'अपने नामांकित कार्यक्रम देखें और प्रबंधित करें',
+    confirmed: 'पुष्ट',
+    pending: 'लंबित',
+    cancelled: 'रद्द',
+    viewDetails: 'विवरण देखें',
     // Medicine
     addMedicine: 'दवा जोड़ें',
-    addNewMedicine: 'नई दवा जोड़ें',
     medicineName: 'दवा का नाम',
     dosage: 'खुराक',
     frequency: 'आवृत्ति',
-    time: 'समय',
+    startDate: 'शुरुआती तारीख',
+    notes: 'टिप्पणियां',
+    saveMedicine: 'दवा सहेजें',
+    markAsTaken: 'लिया गया चिह्नित करें',
     taken: 'लिया गया',
-    skip: 'छोड़ें',
+    scheduled: 'निर्धारित',
+    overdue: 'देर से',
+    // Chat
+    stayConnected: 'अपने परिवार से जुड़े रहें',
+    messages: 'संदेश',
+    typeYourMessage: 'अपना संदेश टाइप करें...',
+    refresh: 'रिफ्रेश',
+    // Profile
+    userProfile: 'उपयोगकर्ता प्रोफाइल',
+    manageYourInfo: 'अपनी व्यक्तिगत जानकारी प्रबंधित करें',
+    editProfile: 'प्रोफाइल संपादित करें',
+    save: 'सहेजें',
     cancel: 'रद्द करें',
-    
-    // Guardian
-    guardianDashboard: 'संरक्षक डैशबोर्ड',
-    monitorLovedOnes: 'अपने प्रियजनों की निगरानी और देखभाल करें',
-    connectedSeniors: 'जुड़े हुए वरिष्ठ',
-    recentEnrollments: 'हाल की गतिविधि दाखिले',
-    medicineAlerts: 'दवा अलर्ट',
-    quickActions: 'त्वरित कार्य',
-    
-    // Stats
-    upcomingEvents: 'आगामी गतिविधियाँ',
-    medicinesScheduled: 'दवाएँ निर्धारित',
-    connectedGuardians: 'जुड़े संरक्षक',
-    
-    // Common
-    error: 'त्रुटि',
-    success: 'सफलता',
-    loading: 'लोड हो रहा है...',
+    fullName: 'पूरा नाम',
+    age: 'उम्र',
+    phoneNumber: 'फोन नंबर',
+    address: 'पता',
+    emergencyContact: 'आपातकालीन संपर्क',
+    medicalConditions: 'चिकित्सा स्थितियां',
+    yearsOld: 'साल का',
+    // Guardian Connections
+    guardianConnections: 'गार्डियन कनेक्शन',
+    manageGuardians: 'अपने गार्डियन कनेक्शन प्रबंधित करें',
+    addGuardian: 'गार्डियन जोड़ें',
+    addNewGuardian: 'नया गार्डियन जोड़ें',
+    enterName: 'पूरा नाम दर्ज करें',
+    relation: 'रिश्ता',
+    enterRelation: 'जैसे, बेटा, बेटी, देखभालकर्ता',
+    enterPhone: 'फोन नंबर दर्ज करें',
+    email: 'ईमेल',
+    optional: 'वैकल्पिक',
+    enterEmail: 'ईमेल पता दर्ज करें',
+    sendInvitation: 'निमंत्रण भेजें',
+    guardianAdded: 'गार्डियन जोड़ा गया',
+    invitationSent: 'निमंत्रण सफलतापूर्वक भेजा गया',
+    guardianRemoved: 'गार्डियन हटाया गया',
+    connectionRemoved: 'कनेक्शन सफलतापूर्वक हटाया गया',
     active: 'सक्रिय',
-    pending: 'लंबित',
-    lastSeen: 'अंतिम बार देखा गया',
-    scheduledFor: 'के लिए निर्धारित',
-    enrolledOn: 'दाखिला लिया गया',
-    upcoming: 'आगामी',
-    
-    // Frequencies
-    onceDaily: 'दिन में एक बार',
-    twiceDaily: 'दिन में दो बार',
-    threeTimes: 'दिन में तीन बार',
-    weekly: 'साप्ताहिक',
-    
-    // Messages
-    fillAllFields: 'कृपया सभी फ़ील्ड भरें',
-    medicineAdded: 'दवा जोड़ी गई',
-    addedSuccessfully: 'सफलतापूर्वक जोड़ा गया',
-    medicineTaken: 'दवा ली गई',
-    markedAsTaken: 'दवा ली गई के रूप में चिह्नित',
-    medicineSkipped: 'दवा छोड़ी गई',
-    reminderSkipped: 'अनुस्मारक छोड़ दिया गया है',
-    stayHealthy: 'समय पर अनुस्मारक के साथ स्वस्थ रहें',
-    enterMedicineName: 'दवा का नाम दर्ज करें',
-    enterDosage: 'खुराक दर्ज करें (जैसे, 500mg)',
-    selectFrequency: 'आवृत्ति चुनें',
+    inactive: 'निष्क्रिय',
+    // Guardian Panel
+    guardianDashboard: 'गार्डियन डैशबोर्ड',
+    monitorLovedOnes: 'अपने प्रियजनों की निगरानी और सहायता करें',
     notificationsOn: 'सूचनाएं चालू',
     notificationsOff: 'सूचनाएं बंद',
+    connectedSeniors: 'जुड़े वरिष्ठ',
+    lastSeen: 'अंतिम बार देखा गया',
+    recentEnrollments: 'हाल के कार्यक्रम नामांकन',
+    enrolledOn: 'नामांकित',
+    upcoming: 'आगामी',
+    medicineAlerts: 'दवा अलर्ट',
+    scheduledFor: 'के लिए निर्धारित',
+    quickActions: 'त्वरित कार्य',
     viewAllActivities: 'सभी गतिविधियां देखें',
     setCustomAlerts: 'कस्टम अलर्ट सेट करें',
+    // Footer stats
+    upcomingEvents: 'आगामी कार्यक्रम',
+    medicinesScheduled: 'निर्धारित दवाएं',
+    connectedGuardians: 'जुड़े गार्डियन',
   },
-  
   ne: {
-    // App
-    appTitle: 'ज्येष्ठ देखभाल केन्द्र',
-    appSubtitle: 'तपाईंको स्वास्थ्य र समुदायको साथी',
-    seniorMode: 'ज्येष्ठ',
-    guardianMode: 'संरक्षक',
-    
-    // Navigation
-    nearbyEvents: 'नजिकका गतिविधिहरू',
-    medicineReminders: 'औषधि सम्झना',
-    guardianPanel: 'संरक्षक प्यानल',
-    
-    // Events
-    morningYoga: 'बिहानको योग सत्र',
-    morningYogaDesc: 'ज्येष्ठ नागरिकहरूका लागि उत्तम नरम योग अभ्यास। मित्रवत समूह सेटिंगमा लचकता र सन्तुलन सुधार गर्नुहोस्।',
-    healthCheckup: 'नि:शुल्क स्वास्थ्य जाँच',
-    healthCheckupDesc: 'रक्तचाप, मधुमेह, र सामान्य कल्याण जाँच सहित व्यापक स्वास्थ्य जाँच।',
-    socialGathering: 'सामुदायिक मेल मिलाप',
-    socialGatheringDesc: 'छिमेकीहरूसँग भेट्नुहोस्, चिया र खाजाको आनन्द लिनुहोस्, र रमाइलो समूह गतिविधिहरूमा भाग लिनुहोस्।',
-    
-    // Actions
+    appTitle: 'सिनियर केयर हब',
+    appSubtitle: 'तपाईंको स्वास्थ्य साथी',
+    seniorMode: 'सिनियर मोड',
+    guardianMode: 'गार्डियन मोड',
+    nearbyEvents: 'नजिकैका कार्यक्रमहरू',
+    medicineReminders: 'औषधि रिमाइन्डर',
+    guardianPanel: 'गार्डियन प्यानल',
+    myEnrollments: 'मेरा दर्ता',
+    chatWithGuardian: 'गार्डियनसँग च्याट',
+    profile: 'प्रोफाइल',
+    guardians: 'गार्डियनहरू',
+    // Event-related
+    morningYoga: 'बिहान योग सत्र',
+    morningYogaDesc: 'वरिष्ठ नागरिकहरूका लागि डिजाइन गरिएका कोमल योग अभ्यासहरूसँग आफ्नो दिन सुरु गर्नुहोस्।',
+    healthCheckup: 'स्वास्थ्य जाँच शिविर',
+    healthCheckupDesc: 'योग्य डाक्टरहरूसँग निःशुल्क स्वास्थ्य जाँच र परामर्श।',
+    socialGathering: 'सामाजिक भेला',
+    socialGatheringDesc: 'समुदायका सदस्यहरूलाई भेट्नुहोस् र सांस्कृतिक गतिविधिहरूको आनन्द लिनुहोस्।',
     enrollNow: 'अहिले दर्ता गर्नुहोस्',
-    enrolled: 'दर्ता भयो',
-    enrollmentSuccess: 'सफलतापूर्वक दर्ता भयो!',
-    enrolledIn: 'तपाईं दर्ता हुनुभयो',
-    filterEvents: 'गतिविधि फिल्टर गर्नुहोस्',
-    away: 'टाढा',
-    
-    // Categories
+    enrolled: 'दर्ता भएको',
+    enrollmentSuccess: 'दर्ता सफल!',
+    enrolledIn: 'सफलतापूर्वक दर्ता भएको',
+    filterEvents: 'कार्यक्रमहरू फिल्टर गर्नुहोस्',
     healthWellness: 'स्वास्थ्य र कल्याण',
     healthcare: 'स्वास्थ्य सेवा',
     social: 'सामाजिक',
-    
+    away: 'टाढा',
+    // My Enrollments
+    viewYourEvents: 'तपाईंका दर्ता भएका कार्यक्रमहरू हेर्नुहोस् र व्यवस्थापन गर्नुहोस्',
+    confirmed: 'पुष्टि भएको',
+    pending: 'पेन्डिङ',
+    cancelled: 'रद्द भएको',
+    viewDetails: 'विवरण हेर्नुहोस्',
     // Medicine
     addMedicine: 'औषधि थप्नुहोस्',
-    addNewMedicine: 'नयाँ औषधि थप्नुहोस्',
     medicineName: 'औषधिको नाम',
     dosage: 'मात्रा',
     frequency: 'आवृत्ति',
-    time: 'समय',
-    taken: 'लिइयो',
-    skip: 'छोड्नुहोस्',
+    startDate: 'सुरु मिति',
+    notes: 'टिप्पणीहरू',
+    saveMedicine: 'औषधि सेभ गर्नुहोस्',
+    markAsTaken: 'खाएको चिन्ह लगाउनुहोस्',
+    taken: 'खाएको',
+    scheduled: 'निर्धारित',
+    overdue: 'ढिलो भएको',
+    // Chat
+    stayConnected: 'आफ्नो परिवारसँग जोडिएर रहनुहोस्',
+    messages: 'सन्देशहरू',
+    typeYourMessage: 'तपाईंको सन्देश टाइप गर्नुहोस्...',
+    refresh: 'रिफ्रेस गर्नुहोस्',
+    // Profile
+    userProfile: 'प्रयोगकर्ता प्रोफाइल',
+    manageYourInfo: 'तपाईंको व्यक्तिगत जानकारी व्यवस्थापन गर्नुहोस्',
+    editProfile: 'प्रोफाइल सम्पादन गर्नुहोस्',
+    save: 'सेभ गर्नुहोस्',
     cancel: 'रद्द गर्नुहोस्',
-    
-    // Guardian
-    guardianDashboard: 'संरक्षक ड्यासबोर्ड',
-    monitorLovedOnes: 'आफ्ना प्रियजनहरूको निगरानी र देखभाल गर्नुहोस्',
-    connectedSeniors: 'जोडिएका ज्येष्ठहरू',
-    recentEnrollments: 'हालका गतिविधि दर्ताहरू',
-    medicineAlerts: 'औषधि अलार्ट',
-    quickActions: 'द्रुत कार्यहरू',
-    
-    // Stats
-    upcomingEvents: 'आगामी गतिविधिहरू',
-    medicinesScheduled: 'औषधि निर्धारित',
-    connectedGuardians: 'जोडिएका संरक्षकहरू',
-    
-    // Common
-    error: 'त्रुटि',
-    success: 'सफलता',
-    loading: 'लोड हुँदै...',
+    fullName: 'पूरा नाम',
+    age: 'उमेर',
+    phoneNumber: 'फोन नम्बर',
+    address: 'ठेगाना',
+    emergencyContact: 'आपतकालीन सम्पर्क',
+    medicalConditions: 'चिकित्सा अवस्था',
+    yearsOld: 'वर्षको',
+    // Guardian Connections
+    guardianConnections: 'गार्डियन जडानहरू',
+    manageGuardians: 'तपाईंका गार्डियन जडानहरू व्यवस्थापन गर्नुहोस्',
+    addGuardian: 'गार्डियन थप्नुहोस्',
+    addNewGuardian: 'नयाँ गार्डियन थप्नुहोस्',
+    enterName: 'पूरा नाम प्रविष्ट गर्नुहोस्',
+    relation: 'सम्बन्ध',
+    enterRelation: 'जस्तै, छोरा, छोरी, हेरचाहकर्ता',
+    enterPhone: 'फोन नम्बर प्रविष्ट गर्नुहोस्',
+    email: 'इमेल',
+    optional: 'वैकल्पिक',
+    enterEmail: 'इमेल ठेगाना प्रविष्ट गर्नुहोस्',
+    sendInvitation: 'निमन्त्रणा पठाउनुहोस्',
+    guardianAdded: 'गार्डियन थपियो',
+    invitationSent: 'निमन्त्रणा सफलतापूर्वक पठाइयो',
+    guardianRemoved: 'गार्डियन हटाइयो',
+    connectionRemoved: 'जडान सफलतापूर्वक हटाइयो',
     active: 'सक्रिय',
-    pending: 'पेन्डिङ',
-    lastSeen: 'अन्तिम पटक देखियो',
-    scheduledFor: 'को लागि निर्धारित',
-    enrolledOn: 'दर्ता गरियो',
+    inactive: 'निष्क्रिय',
+    // Guardian Panel
+    guardianDashboard: 'गार्डियन डश्बोर्ड',
+    monitorLovedOnes: 'तपाईंका प्रियजनहरूको निगरानी र सहायता गर्नुहोस्',
+    notificationsOn: 'सूचनाहरू खुला',
+    notificationsOff: 'सूचनाहरू बन्द',
+    connectedSeniors: 'जोडिएका वरिष्ठहरू',
+    lastSeen: 'अन्तिम पटक देखिएको',
+    recentEnrollments: 'हालैका कार्यक्रम दर्ताहरू',
+    enrolledOn: 'दर्ता भएको',
     upcoming: 'आगामी',
-    
-    // Frequencies
-    onceDaily: 'दिनमा एक पटक',
-    twiceDaily: 'दिनमा दुई पटक',
-    threeTimes: 'दिनमा तीन पटक',
-    weekly: 'साप्ताहिक',
-    
-    // Messages
-    fillAllFields: 'कृपया सबै फिल्डहरू भर्नुहोस्',
-    medicineAdded: 'औषधि थपियो',
-    addedSuccessfully: 'सफलतापूर्वक थपियो',
-    medicineTaken: 'औषधि लिईयो',
-    markedAsTaken: 'औषधि लिईयो भनेर चिन्ह लगाईयो',
-    medicineSkipped: 'औषधि छोडियो',
-    reminderSkipped: 'सम्झना छोडियो',
-    stayHealthy: 'समयमै सम्झनाको साथ स्वस्थ रहनुहोस्',
-    enterMedicineName: 'औषधिको नाम प्रविष्ट गर्नुहोस्',
-    enterDosage: 'मात्रा प्रविष्ट गर्नुहोस् (जस्तै, ५००mg)',
-    selectFrequency: 'आवृत्ति छान्नुहोस्',
-    notificationsOn: 'सूचना खुला',
-    notificationsOff: 'सूचना बन्द',
+    medicineAlerts: 'औषधि अलर्टहरू',
+    scheduledFor: 'को लागि निर्धारित',
+    quickActions: 'द्रुत कार्यहरू',
     viewAllActivities: 'सबै गतिविधिहरू हेर्नुहोस्',
-    setCustomAlerts: 'कस्टम अलार्ट सेट गर्नुहोस्',
+    setCustomAlerts: 'कस्टम अलर्टहरू सेट गर्नुहोस्',
+    // Footer stats
+    upcomingEvents: 'आगामी कार्यक्रमहरू',
+    medicinesScheduled: 'निर्धारित औषधिहरू',
+    connectedGuardians: 'जोडिएका गार्डियनहरू',
   },
 };
-
-const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export const useLanguage = () => {
   const [language, setLanguage] = useState<Language>('en');
 
-  const t = (key: string): string => {
-    return translations[language][key as keyof typeof translations[typeof language]] || key;
+  const t = (key: keyof typeof translations.en): string => {
+    return translations[language][key] || translations.en[key] || key;
   };
 
   return { language, setLanguage, t };
