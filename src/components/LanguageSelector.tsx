@@ -14,7 +14,8 @@ export const LanguageSelector = () => {
   ];
 
   const handleLanguageChange = (value: string) => {
-    setLanguage(value);
+    // Cast the string to Language type since we know it's valid from our options
+    setLanguage(value as 'en' | 'hi' | 'ne');
   };
 
   return (

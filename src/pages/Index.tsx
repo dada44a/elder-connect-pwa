@@ -11,7 +11,7 @@ import { UserProfile } from '@/components/UserProfile';
 import { GuardianConnections } from '@/components/GuardianConnections';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import { useLanguage } from '@/hooks/useLanguage';
-import { AdminDashboard } from '@/components/AdminDashboard';
+import AdminDashboard from '@/components/AdminDashboard';
 
 type UserType = 'senior' | 'guardian';
 

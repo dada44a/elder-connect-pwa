@@ -1,10 +1,21 @@
 import { useState } from 'react';
 
-type Language = 'en' | 'es';
+type Language = 'en' | 'es' | 'hi' | 'ne';
+
+type TranslationKey = 
+  | 'appTitle' | 'appSubtitle' | 'nearbyEvents' | 'myEnrollments' | 'medicineReminders' 
+  | 'chatWithGuardian' | 'profile' | 'guardians' | 'guardianPanel' | 'seniorMode' 
+  | 'guardianMode' | 'upcomingEvents' | 'medicinesScheduled' | 'connectedGuardians'
+  | 'adminDashboard' | 'adminDashboardDesc' | 'overview' | 'userManagement' 
+  | 'eventManagement' | 'eventManagementDesc' | 'systemAlerts' | 'systemSettings' 
+  | 'systemSettingsDesc' | 'totalUsers' | 'activeSeniors' | 'pendingAlerts' 
+  | 'systemHealth' | 'recentUsers' | 'recentAlerts' | 'filter' | 'export' 
+  | 'addUser' | 'edit' | 'view' | 'search' | 'settings' | 'name' | 'type' 
+  | 'status' | 'joinDate' | 'lastActivity' | 'actions';
 
 type Translations = {
   [key in Language]: {
-    [key: string]: string;
+    [key in TranslationKey]: string;
   };
 };
 
@@ -27,7 +38,6 @@ export const useLanguage = () => {
       upcomingEvents: "Upcoming Events",
       medicinesScheduled: "Medicines Scheduled",
       connectedGuardians: "Connected Guardians",
-      // Admin Dashboard translations
       adminDashboard: "Admin Dashboard",
       adminDashboardDesc: "Manage users, events, and system settings",
       overview: "Overview",
@@ -49,6 +59,13 @@ export const useLanguage = () => {
       edit: "Edit",
       view: "View",
       search: "Search",
+      settings: "Settings",
+      name: "Name",
+      type: "Type",
+      status: "Status",
+      joinDate: "Join Date",
+      lastActivity: "Last Activity",
+      actions: "Actions",
     },
     es: {
       appTitle: "Plataforma de Cuidado para Adultos Mayores",
@@ -65,7 +82,6 @@ export const useLanguage = () => {
       upcomingEvents: "Próximos Eventos",
       medicinesScheduled: "Medicamentos Programados",
       connectedGuardians: "Tutores Conectados",
-      // Admin Dashboard translations in Spanish
       adminDashboard: "Panel de Administrador",
       adminDashboardDesc: "Gestionar usuarios, eventos y configuración del sistema",
       overview: "Resumen",
@@ -87,10 +103,105 @@ export const useLanguage = () => {
       edit: "Editar",
       view: "Ver",
       search: "Buscar",
+      settings: "Configuración",
+      name: "Nombre",
+      type: "Tipo",
+      status: "Estado",
+      joinDate: "Fecha de Registro",
+      lastActivity: "Última Actividad",
+      actions: "Acciones",
+    },
+    hi: {
+      appTitle: "वरिष्ठ देखभाल मंच",
+      appSubtitle: "वरिष्ठों और अभिभावकों को जोड़ना",
+      nearbyEvents: "निकटवर्ती कार्यक्रम",
+      myEnrollments: "मेरे नामांकन",
+      medicineReminders: "दवा रिमाइंडर",
+      chatWithGuardian: "अभिभावक के साथ चैट",
+      profile: "प्रोफ़ाइल",
+      guardians: "अभिभावक",
+      guardianPanel: "अभिभावक पैनल",
+      seniorMode: "वरिष्ठ मोड",
+      guardianMode: "अभिभावक मोड",
+      upcomingEvents: "आगामी कार्यक्रम",
+      medicinesScheduled: "निर्धारित दवाएं",
+      connectedGuardians: "जुड़े अभिभावक",
+      adminDashboard: "प्रशासक डैशबोर्ड",
+      adminDashboardDesc: "उपयोगकर्ता, कार्यक्रम और सिस्टम सेटिंग्स का प्रबंधन करें",
+      overview: "अवलोकन",
+      userManagement: "उपयोगकर्ता प्रबंधन",
+      eventManagement: "कार्यक्रम प्रबंधन",
+      eventManagementDesc: "कार्यक्रम, कार्यक्रम और पंजीकरण का प्रबंधन करें",
+      systemAlerts: "सिस्टम अलर्ट",
+      systemSettings: "सिस्टम सेटिंग्स",
+      systemSettingsDesc: "सिस्टम प्राथमिकताएं और सुरक्षा सेटिंग्स कॉन्फ़िगर करें",
+      totalUsers: "कुल उपयोगकर्ता",
+      activeSeniors: "सक्रिय वरिष्ठ",
+      pendingAlerts: "लंबित अलर्ट",
+      systemHealth: "सिस्टम स्वास्थ्य",
+      recentUsers: "हाल के उपयोगकर्ता",
+      recentAlerts: "हाल के अलर्ट",
+      filter: "फ़िल्टर",
+      export: "निर्यात",
+      addUser: "उपयोगकर्ता जोड़ें",
+      edit: "संपादित करें",
+      view: "देखें",
+      search: "खोजें",
+      settings: "सेटिंग्स",
+      name: "नाम",
+      type: "प्रकार",
+      status: "स्थिति",
+      joinDate: "शामिल होने की तारीख",
+      lastActivity: "अंतिम गतिविधि",
+      actions: "कार्य",
+    },
+    ne: {
+      appTitle: "वरिष्ठ हेरचाह प्लेटफर्म",
+      appSubtitle: "वरिष्ठहरू र अभिभावकहरूलाई जोड्दै",
+      nearbyEvents: "नजिकका कार्यक्रमहरू",
+      myEnrollments: "मेरा दर्ता",
+      medicineReminders: "औषधि रिमाइन्डर",
+      chatWithGuardian: "अभिभावकसँग कुराकानी",
+      profile: "प्रोफाइल",
+      guardians: "अभिभावकहरू",
+      guardianPanel: "अभिभावक प्यानल",
+      seniorMode: "वरिष्ठ मोड",
+      guardianMode: "अभिभावक मोड",
+      upcomingEvents: "आगामी कार्यक्रमहरू",
+      medicinesScheduled: "निर्धारित औषधिहरू",
+      connectedGuardians: "जडान भएका अभिभावकहरू",
+      adminDashboard: "प्रशासक ड्यासबोर्ड",
+      adminDashboardDesc: "प्रयोगकर्ता, कार्यक्रम र प्रणाली सेटिङहरू व्यवस्थापन गर्नुहोस्",
+      overview: "अवलोकन",
+      userManagement: "प्रयोगकर्ता व्यवस्थापन",
+      eventManagement: "कार्यक्रम व्यवस्थापन",
+      eventManagementDesc: "कार्यक्रम, तालिका र दर्ता व्यवस्थापन गर्नुहोस्",
+      systemAlerts: "प्रणाली अलर्टहरू",
+      systemSettings: "प्रणाली सेटिङहरू",
+      systemSettingsDesc: "प्रणाली प्राथमिकता र सुरक्षा सेटिङहरू कन्फिगर गर्नुहोस्",
+      totalUsers: "कुल प्रयोगकर्ताहरू",
+      activeSeniors: "सक्रिय वरिष्ठहरू",
+      pendingAlerts: "बाँकी अलर्टहरू",
+      systemHealth: "प्रणाली स्वास्थ्य",
+      recentUsers: "हालका प्रयोगकर्ताहरू",
+      recentAlerts: "हालका अलर्टहरू",
+      filter: "फिल्टर",
+      export: "निर्यात",
+      addUser: "प्रयोगकर्ता थप्नुहोस्",
+      edit: "सम्पादन गर्नुहोस्",
+      view: "हेर्नुहोस्",
+      search: "खोज्नुहोस्",
+      settings: "सेटिङहरू",
+      name: "नाम",
+      type: "प्रकार",
+      status: "स्थिति",
+      joinDate: "सामेल भएको मिति",
+      lastActivity: "अन्तिम गतिविधि",
+      actions: "कार्यहरू",
     }
   };
 
-  const t = (key: string): string => {
+  const t = (key: TranslationKey): string => {
     return translations[language][key] || key;
   };
 
