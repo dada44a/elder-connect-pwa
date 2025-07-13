@@ -1,12 +1,127 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import React, { useState } from 'react';
+import { Calendar, MapPin, Clock, Users, Settings, Heart, Shield } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { EventDiscovery } from '@/components/EventDiscovery';
+import { MedicineReminders } from '@/components/MedicineReminders';
+import { GuardianPanel } from '@/components/GuardianPanel';
+import { LanguageSelector } from '@/components/LanguageSelector';
+import { useLanguage } from '@/hooks/useLanguage';
 
 const Index = () => {
+  const [activeTab, setActiveTab] = useState('events');
+  const [userType, setUserType] = useState('senior'); // 'senior' or 'guardian'
+  const { t, language } = useLanguage();
+
+  const tabs = [
+    { id: 'events', label: t('nearbyEvents'), icon: MapPin },
+    { id: 'medicine', label: t('medicineReminders'), icon: Heart },
+    { id: 'guardian', label: t('guardianPanel'), icon: Shield },
+  ];
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
+      {/* Header */}
+      <header className="bg-white shadow-sm border-b-2 border-blue-100">
+        <div className="max-w-4xl mx-auto px-4 py-4">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center space-x-3">
+              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-green-500 rounded-full flex items-center justify-center">
+                <Heart className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-800">{t('appTitle')}</h1>
+                <p className="text-sm text-gray-600">{t('appSubtitle')}</p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-3">
+              <LanguageSelector />
+              <Button
+                variant={userType === 'senior' ? 'default' : 'outline'}
+                onClick={() => setUserType('senior')}
+                className="text-lg px-6 py-3"
+              >
+                {t('seniorMode')}
+              </Button>
+              <Button
+                variant={userType === 'guardian' ? 'default' : 'outline'}
+                onClick={() => setUserType('guardian')}
+                className="text-lg px-6 py-3"
+              >
+                {t('guardianMode')}
+              </Button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Navigation Tabs */}
+      <nav className="bg-white border-b">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="flex space-x-1">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center space-x-2 px-6 py-4 text-lg font-medium border-b-3 transition-colors ${
+                    activeTab === tab.id
+                      ? 'border-blue-500 text-blue-600 bg-blue-50'
+                      : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                  }`}
+                >
+                  <Icon className="h-5 w-5" />
+                  <span>{tab.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </nav>
+
+      {/* Main Content */}
+      <main className="max-w-4xl mx-auto px-4 py-8">
+        {activeTab === 'events' && <EventDiscovery userType={userType} />}
+        {activeTab === 'medicine' && <MedicineReminders />}
+        {activeTab === 'guardian' && <GuardianPanel />}
+      </main>
+
+      {/* Quick Stats Footer */}
+      <footer className="mt-16 bg-white border-t">
+        <div className="max-w-4xl mx-auto px-4 py-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Card>
+              <CardContent className="flex items-center space-x-4 p-6">
+                <Calendar className="h-8 w-8 text-blue-500" />
+                <div>
+                  <div className="text-2xl font-bold text-gray-900">5</div>
+                  <div className="text-sm text-gray-600">{t('upcomingEvents')}</div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="flex items-center space-x-4 p-6">
+                <Heart className="h-8 w-8 text-green-500" />
+                <div>
+                  <div className="text-2xl font-bold text-gray-900">3</div>
+                  <div className="text-sm text-gray-600">{t('medicinesScheduled')}</div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="flex items-center space-x-4 p-6">
+                <Users className="h-8 w-8 text-purple-500" />
+                <div>
+                  <div className="text-2xl font-bold text-gray-900">2</div>
+                  <div className="text-sm text-gray-600">{t('connectedGuardians')}</div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
