@@ -5,11 +5,22 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
 import { useLanguage } from '@/hooks/useLanguage';
 
 export const ChatWithGuardian = () => {
   const { t } = useLanguage();
   const [newMessage, setNewMessage] = useState('');
+  const [selectedGuardian, setSelectedGuardian] = useState('रमेश (पुत्र)');
+  
+  // Sample guardians list
+  const guardians = [
+    { id: 'ramesh', name: 'रमेश (पुत्र)' },
+    { id: 'sunita', name: 'सुनिता (बुहारी)' },
+    { id: 'maya', name: 'माया (छोरी)' },
+  ];
+
   const [messages, setMessages] = useState([
     {
       id: 1,
@@ -18,6 +29,7 @@ export const ChatWithGuardian = () => {
       content: 'नमस्ते बाबा! कस्तो छ तपाईंको स्वास्थ्य?',
       timestamp: '2025-01-13 10:30',
       isRead: true,
+      guardianId: 'ramesh',
     },
     {
       id: 2,
@@ -26,6 +38,7 @@ export const ChatWithGuardian = () => {
       content: 'सबै राम्रै छ बेटा। म योगा कक्षामा जाने छु भोलि।',
       timestamp: '2025-01-13 11:00',
       isRead: true,
+      guardianId: 'ramesh',
     },
     {
       id: 3,
@@ -34,11 +47,29 @@ export const ChatWithGuardian = () => {
       content: 'वाह! त्यो धेरै राम्रो कुरा हो। के तपाईंले आफ्नो औषधि खानुभयो?',
       timestamp: '2025-01-13 14:15',
       isRead: false,
+      guardianId: 'sunita',
+    },
+    {
+      id: 4,
+      sender: 'guardian',
+      senderName: 'माया (छोरी)',
+      content: 'बुबा, कहिले घर आउनुहुन्छ? सबैले तपाईंलाई सम्झिरहेका छन्।',
+      timestamp: '2025-01-13 16:20',
+      isRead: false,
+      guardianId: 'maya',
     },
   ]);
 
+  // Filter messages based on selected guardian
+  const filteredMessages = messages.filter(message => {
+    if (message.sender === 'elder') return true; // Show all elder messages
+    const guardian = guardians.find(g => g.name === selectedGuardian);
+    return message.guardianId === guardian?.id;
+  });
+
   const handleSendMessage = () => {
     if (newMessage.trim()) {
+      const guardian = guardians.find(g => g.name === selectedGuardian);
       const message = {
         id: messages.length + 1,
         sender: 'elder' as const,
@@ -46,6 +77,7 @@ export const ChatWithGuardian = () => {
         content: newMessage,
         timestamp: new Date().toLocaleString(),
         isRead: true,
+        guardianId: guardian?.id || 'ramesh',
       };
       setMessages([...messages, message]);
       setNewMessage('');
@@ -75,11 +107,28 @@ export const ChatWithGuardian = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-xl">{t('messages')}</CardTitle>
+          <div className="flex justify-between items-center">
+            <CardTitle className="text-xl">{t('messages')}</CardTitle>
+            <div className="flex items-center space-x-2">
+              <Label htmlFor="guardian-select" className="text-lg">{t('chatWith')}:</Label>
+              <Select value={selectedGuardian} onValueChange={setSelectedGuardian}>
+                <SelectTrigger className="w-48 text-lg">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {guardians.map((guardian) => (
+                    <SelectItem key={guardian.id} value={guardian.name} className="text-lg">
+                      {guardian.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="space-y-4 max-h-96 overflow-y-auto mb-4">
-            {messages.map((message) => (
+            {filteredMessages.map((message) => (
               <div
                 key={message.id}
                 className={`flex items-start space-x-3 ${
@@ -110,7 +159,7 @@ export const ChatWithGuardian = () => {
             <Textarea
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
-              placeholder={t('typeYourMessage')}
+              placeholder={`${t('typeYourMessage')} ${selectedGuardian}`}
               className="flex-1 text-lg"
               rows={2}
             />
