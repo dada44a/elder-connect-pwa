@@ -14,10 +14,14 @@ export const LanguageSelector = () => {
     { code: 'ne', name: 'नेपाली', flag: '🇳🇵' },
   ];
 
+  const handleLanguageChange = (value: string) => {
+    setLanguage(value as 'en' | 'hi' | 'ne');
+  };
+
   return (
     <div className="flex items-center space-x-2">
       <Globe className="h-5 w-5 text-gray-600" />
-      <Select value={language} onValueChange={setLanguage}>
+      <Select value={language} onValueChange={handleLanguageChange}>
         <SelectTrigger className="w-32">
           <SelectValue />
         </SelectTrigger>

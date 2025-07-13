@@ -9,9 +9,11 @@ import { GuardianPanel } from '@/components/GuardianPanel';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import { useLanguage } from '@/hooks/useLanguage';
 
+type UserType = 'senior' | 'guardian';
+
 const Index = () => {
   const [activeTab, setActiveTab] = useState('events');
-  const [userType, setUserType] = useState('senior'); // 'senior' or 'guardian'
+  const [userType, setUserType] = useState<UserType>('senior');
   const { t, language } = useLanguage();
 
   const tabs = [
@@ -19,6 +21,10 @@ const Index = () => {
     { id: 'medicine', label: t('medicineReminders'), icon: Heart },
     { id: 'guardian', label: t('guardianPanel'), icon: Shield },
   ];
+
+  const handleUserTypeChange = (type: UserType) => {
+    setUserType(type);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
@@ -39,14 +45,14 @@ const Index = () => {
               <LanguageSelector />
               <Button
                 variant={userType === 'senior' ? 'default' : 'outline'}
-                onClick={() => setUserType('senior')}
+                onClick={() => handleUserTypeChange('senior')}
                 className="text-lg px-6 py-3"
               >
                 {t('seniorMode')}
               </Button>
               <Button
                 variant={userType === 'guardian' ? 'default' : 'outline'}
-                onClick={() => setUserType('guardian')}
+                onClick={() => handleUserTypeChange('guardian')}
                 className="text-lg px-6 py-3"
               >
                 {t('guardianMode')}
