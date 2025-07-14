@@ -47,34 +47,88 @@ export type Database = {
         }
         Relationships: []
       }
+      enrollments: {
+        Row: {
+          enrolled_at: string
+          event_id: number
+          id: number
+          status: string
+          user_id: number
+        }
+        Insert: {
+          enrolled_at?: string
+          event_id: number
+          id?: number
+          status?: string
+          user_id: number
+        }
+        Update: {
+          enrolled_at?: string
+          event_id?: number
+          id?: number
+          status?: string
+          user_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "enrollments_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "Event"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "enrollments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "User"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       Event: {
         Row: {
+          category: string | null
           createdAt: string
           createdById: number | null
           date: string
           description: string | null
+          distance: string | null
           id: number
+          image_url: string | null
           location: string | null
+          max_participants: number | null
+          participants: number | null
           time: string | null
           title: string
         }
         Insert: {
+          category?: string | null
           createdAt?: string
           createdById?: number | null
           date: string
           description?: string | null
+          distance?: string | null
           id?: number
+          image_url?: string | null
           location?: string | null
+          max_participants?: number | null
+          participants?: number | null
           time?: string | null
           title: string
         }
         Update: {
+          category?: string | null
           createdAt?: string
           createdById?: number | null
           date?: string
           description?: string | null
+          distance?: string | null
           id?: number
+          image_url?: string | null
           location?: string | null
+          max_participants?: number | null
+          participants?: number | null
           time?: string | null
           title?: string
         }
@@ -82,6 +136,48 @@ export type Database = {
           {
             foreignKeyName: "Event_createdById_fkey"
             columns: ["createdById"]
+            isOneToOne: false
+            referencedRelation: "User"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      guardian_connections: {
+        Row: {
+          connected_at: string
+          guardian_id: number
+          id: number
+          relation: string | null
+          senior_id: number
+          status: string
+        }
+        Insert: {
+          connected_at?: string
+          guardian_id: number
+          id?: number
+          relation?: string | null
+          senior_id: number
+          status?: string
+        }
+        Update: {
+          connected_at?: string
+          guardian_id?: number
+          id?: number
+          relation?: string | null
+          senior_id?: number
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guardian_connections_guardian_id_fkey"
+            columns: ["guardian_id"]
+            isOneToOne: false
+            referencedRelation: "User"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "guardian_connections_senior_id_fkey"
+            columns: ["senior_id"]
             isOneToOne: false
             referencedRelation: "User"
             referencedColumns: ["id"]
@@ -96,7 +192,10 @@ export type Database = {
           frequency: string | null
           id: number
           name: string
+          next_due: string | null
           startDate: string | null
+          taken: boolean | null
+          time_of_day: string | null
           userId: number
         }
         Insert: {
@@ -106,7 +205,10 @@ export type Database = {
           frequency?: string | null
           id?: number
           name: string
+          next_due?: string | null
           startDate?: string | null
+          taken?: boolean | null
+          time_of_day?: string | null
           userId: number
         }
         Update: {
@@ -116,7 +218,10 @@ export type Database = {
           frequency?: string | null
           id?: number
           name?: string
+          next_due?: string | null
           startDate?: string | null
+          taken?: boolean | null
+          time_of_day?: string | null
           userId?: number
         }
         Relationships: [
@@ -176,6 +281,7 @@ export type Database = {
           isAdmin: boolean
           name: string
           passwordHash: string
+          role: string | null
           updatedAt: string
         }
         Insert: {
@@ -185,6 +291,7 @@ export type Database = {
           isAdmin?: boolean
           name: string
           passwordHash: string
+          role?: string | null
           updatedAt?: string
         }
         Update: {
@@ -194,6 +301,7 @@ export type Database = {
           isAdmin?: boolean
           name?: string
           passwordHash?: string
+          role?: string | null
           updatedAt?: string
         }
         Relationships: []

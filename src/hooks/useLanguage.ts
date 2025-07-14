@@ -31,7 +31,8 @@ type TranslationKey =
   | 'addMedicine' | 'addNewMedicine' | 'medicineName' | 'enterMedicineName' 
   | 'dosage' | 'enterDosage' | 'frequency' | 'selectFrequency' | 'onceDaily' 
   | 'twiceDaily' | 'threeTimes' | 'weekly' | 'time' | 'skip' | 'viewYourEvents'
-  | 'confirmed' | 'cancelled' | 'viewDetails';
+  | 'confirmed' | 'cancelled' | 'viewDetails' | 'loading' | 'noEnrollments' 
+  | 'noEventsAvailable' | 'noMedicines';
 
 type Translations = {
   [key in Language]: {
@@ -179,6 +180,10 @@ export const useLanguage = () => {
       confirmed: "Confirmed",
       cancelled: "Cancelled",
       viewDetails: "View Details",
+      loading: "Loading",
+      noEnrollments: "No enrollments found",
+      noEventsAvailable: "No events available",
+      noMedicines: "No medicines added yet",
     },
     es: {
       appTitle: "Plataforma de Cuidado para Adultos Mayores",
@@ -316,6 +321,10 @@ export const useLanguage = () => {
       confirmed: "Confirmado",
       cancelled: "Cancelado",
       viewDetails: "Ver Detalles",
+      loading: "Cargando",
+      noEnrollments: "No se encontraron inscripciones",
+      noEventsAvailable: "No hay eventos disponibles",
+      noMedicines: "Aún no se han agregado medicamentos",
     },
     hi: {
       appTitle: "वरिष्ठ देखभाल मंच",
@@ -453,6 +462,10 @@ export const useLanguage = () => {
       confirmed: "पुष्ट",
       cancelled: "रद्द",
       viewDetails: "विवरण देखें",
+      loading: "लोड हो रहा है",
+      noEnrollments: "कोई नामांकन नहीं मिला",
+      noEventsAvailable: "कोई कार्यक्रम उपलब्ध नहीं",
+      noMedicines: "अभी तक कोई दवा नहीं जोड़ी गई",
     },
     ne: {
       appTitle: "वरिष्ठ हेरचाह प्लेटफर्म",
@@ -590,6 +603,10 @@ export const useLanguage = () => {
       confirmed: "पुष्टि भएको",
       cancelled: "रद्द गरिएको",
       viewDetails: "विवरणहरू हेर्नुहोस्",
+      loading: "लोड हुँदै",
+      noEnrollments: "कुनै दर्ता फेला परेन",
+      noEventsAvailable: "कुनै कार्यक्रम उपलब्ध छैन",
+      noMedicines: "अझै कुनै औषधि थपिएको छैन",
     }
   };
 

@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Users, UserPlus, Trash2, Phone, Mail } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,11 +9,23 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+
+interface Guardian {
+  id: number;
+  name: string;
+  relation: string;
+  phone: string;
+  email: string;
+  status: string;
+  connectedDate: string;
+}
 
 export const GuardianConnections = () => {
   const { t } = useLanguage();
   const { toast } = useToast();
   const [showAddForm, setShowAddForm] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [newGuardian, setNewGuardian] = useState({
     name: '',
     relation: '',
@@ -21,52 +33,105 @@ export const GuardianConnections = () => {
     email: '',
   });
 
-  const [guardians, setGuardians] = useState([
-    {
-      id: 1,
-      name: 'रमेश बहादुर',
-      relation: 'पुत्र',
-      phone: '+977-9841234567',
-      email: 'ramesh@email.com',
-      status: 'active',
-      connectedDate: '2024-12-01',
-    },
-    {
-      id: 2,
-      name: 'सुनिता देवी',
-      relation: 'बुहारी',
-      phone: '+977-9812345678',
-      email: 'sunita@email.com',
-      status: 'active',
-      connectedDate: '2024-12-15',
-    },
-  ]);
+  const [guardians, setGuardians] = useState<Guardian[]>([]);
 
-  const handleAddGuardian = () => {
+  useEffect(() => {
+    const fetchGuardians = async () => {
+      try {
+        // For now, we'll show sample data since guardian connections require more complex setup
+        // In a real app, you'd fetch from guardian_connections table
+        const sampleGuardians = [
+          {
+            id: 1,
+            name: 'रमेश बहादुर',
+            relation: 'पुत्र',
+            phone: '+977-9841234567',
+            email: 'ramesh@email.com',
+            status: 'active',
+            connectedDate: '2024-12-01',
+          },
+          {
+            id: 2,
+            name: 'सुनिता देवी',
+            relation: 'बुहारी',
+            phone: '+977-9812345678',
+            email: 'sunita@email.com',
+            status: 'active',
+            connectedDate: '2024-12-15',
+          },
+        ];
+        setGuardians(sampleGuardians);
+      } catch (error) {
+        console.error('Error:', error);
+        toast({
+          title: t('error'),
+          description: 'Failed to load guardian connections',
+          variant: 'destructive',
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchGuardians();
+  }, [t, toast]);
+
+  const handleAddGuardian = async () => {
     if (newGuardian.name && newGuardian.relation && newGuardian.phone) {
-      const guardian = {
-        id: guardians.length + 1,
-        ...newGuardian,
-        status: 'pending' as const,
-        connectedDate: new Date().toISOString().split('T')[0],
-      };
-      setGuardians([...guardians, guardian]);
-      setNewGuardian({ name: '', relation: '', phone: '', email: '' });
-      setShowAddForm(false);
+      try {
+        // For now, we'll just add to the local state since this requires user authentication
+        // In a real app, you'd insert into guardian_connections table
+        const guardian = {
+          id: guardians.length + 1,
+          ...newGuardian,
+          status: 'pending' as const,
+          connectedDate: new Date().toISOString().split('T')[0],
+        };
+        setGuardians([...guardians, guardian]);
+        setNewGuardian({ name: '', relation: '', phone: '', email: '' });
+        setShowAddForm(false);
+        toast({
+          title: t('guardianAdded'),
+          description: t('invitationSent'),
+        });
+      } catch (error) {
+        console.error('Error:', error);
+        toast({
+          title: t('error'),
+          description: 'Failed to add guardian',
+          variant: 'destructive',
+        });
+      }
+    }
+  };
+
+  const handleRemoveGuardian = async (id: number) => {
+    try {
+      // In a real app, you'd delete from guardian_connections table
+      setGuardians(guardians.filter(guardian => guardian.id !== id));
       toast({
-        title: t('guardianAdded'),
-        description: t('invitationSent'),
+        title: t('guardianRemoved'),
+        description: t('connectionRemoved'),
+      });
+    } catch (error) {
+      console.error('Error:', error);
+      toast({
+        title: t('error'),
+        description: 'Failed to remove guardian',
+        variant: 'destructive',
       });
     }
   };
 
-  const handleRemoveGuardian = (id: number) => {
-    setGuardians(guardians.filter(guardian => guardian.id !== id));
-    toast({
-      title: t('guardianRemoved'),
-      description: t('connectionRemoved'),
-    });
-  };
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="text-center py-8">
+          <div className="text-lg">{t('loading')}...</div>
+        </div>
+      </div>
+    );
+  }
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -157,7 +222,14 @@ export const GuardianConnections = () => {
       )}
 
       <div className="grid gap-4">
-        {guardians.map((guardian) => (
+        {guardians.length === 0 ? (
+          <Card>
+            <CardContent className="p-6 text-center">
+              <p className="text-gray-500 text-lg">{t('noMedicines')}</p>
+            </CardContent>
+          </Card>
+        ) : (
+          guardians.map((guardian) => (
           <Card key={guardian.id}>
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
@@ -201,7 +273,8 @@ export const GuardianConnections = () => {
               </div>
             </CardContent>
           </Card>
-        ))}
+          ))
+        )}
       </div>
     </div>
   );

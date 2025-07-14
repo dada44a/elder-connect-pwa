@@ -1,44 +1,98 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Calendar, MapPin, Clock, Users, Eye } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/hooks/useLanguage';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+
+interface EnrolledEvent {
+  id: number;
+  title: string;
+  date: string;
+  time: string;
+  location: string;
+  status: string;
+  category: string;
+  description?: string;
+}
 
 export const MyEnrollments = () => {
   const { t } = useLanguage();
+  const { toast } = useToast();
+  const [enrolledEvents, setEnrolledEvents] = useState<EnrolledEvent[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Mock enrolled events data
-  const enrolledEvents = [
-    {
-      id: 1,
-      title: t('morningYoga'),
-      date: '2025-01-15',
-      time: '07:00 AM',
-      location: 'Community Park',
-      status: 'confirmed',
-      category: 'Health & Wellness',
-    },
-    {
-      id: 2,
-      title: t('healthCheckup'),
-      date: '2025-01-16',
-      time: '10:00 AM',
-      location: 'Senior Center',
-      status: 'confirmed',
-      category: 'Healthcare',
-    },
-    {
-      id: 3,
-      title: t('socialGathering'),
-      date: '2025-01-17',
-      time: '03:00 PM',
-      location: 'Community Hall',
-      status: 'pending',
-      category: 'Social',
-    },
-  ];
+  useEffect(() => {
+    const fetchEnrollments = async () => {
+      try {
+        // For now, we'll use a placeholder user ID (1) since auth isn't implemented
+        // In a real app, you'd use the authenticated user's ID
+        const { data: enrollments, error } = await supabase
+          .from('enrollments')
+          .select(`
+            id,
+            status,
+            Event:event_id (
+              id,
+              title,
+              description,
+              date,
+              time,
+              location,
+              category
+            )
+          `)
+          .eq('user_id', 1);
+
+        if (error) {
+          console.error('Error fetching enrollments:', error);
+          toast({
+            title: t('error'),
+            description: 'Failed to load enrollments',
+            variant: 'destructive',
+          });
+          return;
+        }
+
+        const formattedEvents = enrollments?.map((enrollment: any) => ({
+          id: enrollment.Event.id,
+          title: enrollment.Event.title,
+          date: new Date(enrollment.Event.date).toLocaleDateString(),
+          time: new Date(enrollment.Event.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          location: enrollment.Event.location || 'TBD',
+          status: enrollment.status,
+          category: enrollment.Event.category || 'General',
+          description: enrollment.Event.description,
+        })) || [];
+
+        setEnrolledEvents(formattedEvents);
+      } catch (error) {
+        console.error('Error:', error);
+        toast({
+          title: t('error'),
+          description: 'Failed to load enrollments',
+          variant: 'destructive',
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEnrollments();
+  }, [t, toast]);
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="text-center py-8">
+          <div className="text-lg">{t('loading')}...</div>
+        </div>
+      </div>
+    );
+  }
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -69,7 +123,14 @@ export const MyEnrollments = () => {
       </div>
 
       <div className="grid gap-6">
-        {enrolledEvents.map((event) => (
+        {enrolledEvents.length === 0 ? (
+          <Card>
+            <CardContent className="p-6 text-center">
+              <p className="text-gray-500 text-lg">{t('noEnrollments')}</p>
+            </CardContent>
+          </Card>
+        ) : (
+          enrolledEvents.map((event) => (
           <Card key={event.id} className="hover:shadow-lg transition-shadow">
             <CardContent className="p-6">
               <div className="flex justify-between items-start mb-4">
@@ -110,7 +171,8 @@ export const MyEnrollments = () => {
               </div>
             </CardContent>
           </Card>
-        ))}
+          ))
+        )}
       </div>
     </div>
   );

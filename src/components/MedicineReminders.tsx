@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Plus, Clock, Bell, Check, X, Pill } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,40 +9,69 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+
+interface Medicine {
+  id: number;
+  name: string;
+  dosage: string;
+  frequency: string;
+  time: string;
+  nextDue: string;
+  taken: boolean;
+}
 
 export const MedicineReminders = () => {
   const { t } = useLanguage();
   const { toast } = useToast();
   const [showAddForm, setShowAddForm] = useState(false);
-  const [medicines, setMedicines] = useState([
-    {
-      id: 1,
-      name: 'Vitamin D',
-      dosage: '1000 IU',
-      frequency: 'Daily',
-      time: '08:00 AM',
-      nextDue: '2025-01-14 08:00',
-      taken: false,
-    },
-    {
-      id: 2,
-      name: 'Blood Pressure Medicine',
-      dosage: '5mg',
-      frequency: 'Twice Daily',
-      time: '08:00 AM, 08:00 PM',
-      nextDue: '2025-01-14 08:00',
-      taken: true,
-    },
-    {
-      id: 3,
-      name: 'Calcium',
-      dosage: '500mg',
-      frequency: 'Daily',
-      time: '10:00 AM',
-      nextDue: '2025-01-14 10:00',
-      taken: false,
-    },
-  ]);
+  const [medicines, setMedicines] = useState<Medicine[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchMedicines = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('Medicine')
+          .select('*')
+          .eq('userId', 1) // placeholder user ID
+          .order('name');
+
+        if (error) {
+          console.error('Error fetching medicines:', error);
+          toast({
+            title: t('error'),
+            description: 'Failed to load medicines',
+            variant: 'destructive',
+          });
+          return;
+        }
+
+        const formattedMedicines = data?.map((med: any) => ({
+          id: med.id,
+          name: med.name,
+          dosage: med.dosage || 'Not specified',
+          frequency: med.frequency || 'As needed',
+          time: med.time_of_day || '08:00 AM',
+          nextDue: med.next_due || new Date().toISOString(),
+          taken: med.taken || false,
+        })) || [];
+
+        setMedicines(formattedMedicines);
+      } catch (error) {
+        console.error('Error:', error);
+        toast({
+          title: t('error'),
+          description: 'Failed to load medicines',
+          variant: 'destructive',
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMedicines();
+  }, [t, toast]);
 
   const [newMedicine, setNewMedicine] = useState({
     name: '',
@@ -51,7 +80,7 @@ export const MedicineReminders = () => {
     time: '',
   });
 
-  const handleAddMedicine = () => {
+  const handleAddMedicine = async () => {
     if (!newMedicine.name || !newMedicine.dosage || !newMedicine.frequency || !newMedicine.time) {
       toast({
         title: t('error'),
@@ -61,31 +90,93 @@ export const MedicineReminders = () => {
       return;
     }
 
-    const newId = Math.max(...medicines.map(m => m.id)) + 1;
-    setMedicines([...medicines, {
-      id: newId,
-      ...newMedicine,
-      nextDue: `2025-01-14 ${newMedicine.time}`,
-      taken: false,
-    }]);
+    try {
+      const { data, error } = await supabase
+        .from('Medicine')
+        .insert([
+          {
+            name: newMedicine.name,
+            dosage: newMedicine.dosage,
+            frequency: newMedicine.frequency,
+            time_of_day: newMedicine.time,
+            userId: 1, // placeholder user ID
+            next_due: new Date().toISOString(),
+            taken: false,
+          }
+        ])
+        .select()
+        .single();
 
-    setNewMedicine({ name: '', dosage: '', frequency: '', time: '' });
-    setShowAddForm(false);
-    
-    toast({
-      title: t('medicineAdded'),
-      description: `${newMedicine.name} ${t('addedSuccessfully')}`,
-    });
+      if (error) {
+        console.error('Error adding medicine:', error);
+        toast({
+          title: t('error'),
+          description: 'Failed to add medicine',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      const newMed = {
+        id: data.id,
+        name: data.name,
+        dosage: data.dosage,
+        frequency: data.frequency,
+        time: data.time_of_day,
+        nextDue: data.next_due,
+        taken: data.taken,
+      };
+
+      setMedicines([...medicines, newMed]);
+      setNewMedicine({ name: '', dosage: '', frequency: '', time: '' });
+      setShowAddForm(false);
+      
+      toast({
+        title: t('medicineAdded'),
+        description: `${newMedicine.name} ${t('addedSuccessfully')}`,
+      });
+    } catch (error) {
+      console.error('Error:', error);
+      toast({
+        title: t('error'),
+        description: 'Failed to add medicine',
+        variant: 'destructive',
+      });
+    }
   };
 
-  const markAsTaken = (id: number) => {
-    setMedicines(medicines.map(med => 
-      med.id === id ? { ...med, taken: true } : med
-    ));
-    toast({
-      title: t('medicineTaken'),
-      description: t('markedAsTaken'),
-    });
+  const markAsTaken = async (id: number) => {
+    try {
+      const { error } = await supabase
+        .from('Medicine')
+        .update({ taken: true })
+        .eq('id', id);
+
+      if (error) {
+        console.error('Error updating medicine:', error);
+        toast({
+          title: t('error'),
+          description: 'Failed to update medicine',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      setMedicines(medicines.map(med => 
+        med.id === id ? { ...med, taken: true } : med
+      ));
+      toast({
+        title: t('medicineTaken'),
+        description: t('markedAsTaken'),
+      });
+    } catch (error) {
+      console.error('Error:', error);
+      toast({
+        title: t('error'),
+        description: 'Failed to update medicine',
+        variant: 'destructive',
+      });
+    }
   };
 
   const skipMedicine = (id: number) => {
@@ -95,6 +186,16 @@ export const MedicineReminders = () => {
       variant: 'destructive',
     });
   };
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="text-center py-8">
+          <div className="text-lg">{t('loading')}...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -183,7 +284,14 @@ export const MedicineReminders = () => {
 
       {/* Medicine List */}
       <div className="grid gap-4">
-        {medicines.map((medicine) => (
+        {medicines.length === 0 ? (
+          <Card>
+            <CardContent className="p-6 text-center">
+              <p className="text-gray-500 text-lg">{t('noMedicines')}</p>
+            </CardContent>
+          </Card>
+        ) : (
+          medicines.map((medicine) => (
           <Card key={medicine.id} className={`${medicine.taken ? 'bg-green-50 border-green-200' : 'bg-white'}`}>
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
@@ -236,7 +344,8 @@ export const MedicineReminders = () => {
               </div>
             </CardContent>
           </Card>
-        ))}
+          ))
+        )}
       </div>
     </div>
   );

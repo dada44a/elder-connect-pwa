@@ -1,70 +1,128 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MapPin, Calendar, Users, Clock, Heart, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface EventDiscoveryProps {
   userType: 'senior' | 'guardian';
+}
+
+interface Event {
+  id: number;
+  title: string;
+  description: string;
+  date: string;
+  time: string;
+  location: string;
+  distance: string;
+  category: string;
+  participants: number;
+  maxParticipants: number;
+  image: string;
 }
 
 export const EventDiscovery: React.FC<EventDiscoveryProps> = ({ userType }) => {
   const { t } = useLanguage();
   const { toast } = useToast();
   const [enrolledEvents, setEnrolledEvents] = useState<Set<number>>(new Set());
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const events = [
-    {
-      id: 1,
-      title: t('morningYoga'),
-      description: t('morningYogaDesc'),
-      date: '2025-01-15',
-      time: '07:00 AM',
-      location: 'Community Park',
-      distance: '0.5 km',
-      category: 'Health & Wellness',
-      participants: 12,
-      maxParticipants: 20,
-      image: '/placeholder.svg',
-    },
-    {
-      id: 2,
-      title: t('healthCheckup'),
-      description: t('healthCheckupDesc'),
-      date: '2025-01-16',
-      time: '10:00 AM',
-      location: 'Senior Center',
-      distance: '1.2 km',
-      category: 'Healthcare',
-      participants: 8,
-      maxParticipants: 15,
-      image: '/placeholder.svg',
-    },
-    {
-      id: 3,
-      title: t('socialGathering'),
-      description: t('socialGatheringDesc'),
-      date: '2025-01-17',
-      time: '03:00 PM',
-      location: 'Community Hall',
-      distance: '0.8 km',
-      category: 'Social',
-      participants: 25,
-      maxParticipants: 30,
-      image: '/placeholder.svg',
-    },
-  ];
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('Event')
+          .select('*')
+          .order('date', { ascending: true });
 
-  const handleEnroll = (eventId: number, eventTitle: string) => {
-    setEnrolledEvents(prev => new Set([...prev, eventId]));
-    toast({
-      title: t('enrollmentSuccess'),
-      description: `${t('enrolledIn')} "${eventTitle}"`,
-      duration: 3000,
-    });
+        if (error) {
+          console.error('Error fetching events:', error);
+          toast({
+            title: t('error'),
+            description: 'Failed to load events',
+            variant: 'destructive',
+          });
+          return;
+        }
+
+        const formattedEvents = data?.map((event: any) => ({
+          id: event.id,
+          title: event.title,
+          description: event.description || 'No description available',
+          date: new Date(event.date).toLocaleDateString(),
+          time: new Date(event.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          location: event.location || 'TBD',
+          distance: event.distance || '1.0 km',
+          category: event.category || 'General',
+          participants: event.participants || 0,
+          maxParticipants: event.max_participants || 50,
+          image: event.image_url || '/placeholder.svg',
+        })) || [];
+
+        setEvents(formattedEvents);
+
+        // Fetch user's enrollments
+        const { data: enrollments } = await supabase
+          .from('enrollments')
+          .select('event_id')
+          .eq('user_id', 1); // placeholder user ID
+
+        if (enrollments) {
+          setEnrolledEvents(new Set(enrollments.map(e => e.event_id)));
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        toast({
+          title: t('error'),
+          description: 'Failed to load events',
+          variant: 'destructive',
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEvents();
+  }, [t, toast]);
+
+  const handleEnroll = async (eventId: number, eventTitle: string) => {
+    try {
+      const { error } = await supabase
+        .from('enrollments')
+        .insert([
+          { user_id: 1, event_id: eventId, status: 'confirmed' }
+        ]);
+
+      if (error) {
+        console.error('Error enrolling:', error);
+        toast({
+          title: t('error'),
+          description: 'Failed to enroll in event',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      setEnrolledEvents(prev => new Set([...prev, eventId]));
+      toast({
+        title: t('enrollmentSuccess'),
+        description: `${t('enrolledIn')} "${eventTitle}"`,
+        duration: 3000,
+      });
+    } catch (error) {
+      console.error('Error:', error);
+      toast({
+        title: t('error'),
+        description: 'Failed to enroll in event',
+        variant: 'destructive',
+      });
+    }
   };
 
   const getCategoryColor = (category: string) => {
@@ -75,6 +133,16 @@ export const EventDiscovery: React.FC<EventDiscoveryProps> = ({ userType }) => {
       default: return 'bg-gray-100 text-gray-800';
     }
   };
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="text-center py-8">
+          <div className="text-lg">{t('loading')}...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -103,7 +171,14 @@ export const EventDiscovery: React.FC<EventDiscoveryProps> = ({ userType }) => {
 
       {/* Events Grid */}
       <div className="grid gap-6">
-        {events.map((event) => (
+        {events.length === 0 ? (
+          <Card>
+            <CardContent className="p-6 text-center">
+              <p className="text-gray-500 text-lg">{t('noEventsAvailable')}</p>
+            </CardContent>
+          </Card>
+        ) : (
+          events.map((event) => (
           <Card key={event.id} className="overflow-hidden hover:shadow-lg transition-shadow">
             <div className="flex flex-col lg:flex-row">
               {/* Event Image */}
@@ -166,7 +241,8 @@ export const EventDiscovery: React.FC<EventDiscoveryProps> = ({ userType }) => {
               </div>
             </div>
           </Card>
-        ))}
+          ))
+        )}
       </div>
     </div>
   );
